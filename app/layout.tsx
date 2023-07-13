@@ -1,8 +1,13 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import './globals.css';
+import type { Metadata } from 'next';
+import { Nunito } from 'next/font/google';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEllipsis, faCircle, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import '@fortawesome/fontawesome-svg-core/styles.css';
 
-const inter = Inter({ subsets: ['latin'] })
+library.add(faEllipsis, faCircle, faCircleXmark);
+
+const nunito = Nunito({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -16,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={nunito.className}>{children}</body>
     </html>
   )
 }
