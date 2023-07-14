@@ -22,6 +22,19 @@ export const addNote = async (note:any) => {
       throw new Error(response.statusText);
     }
 };
+
+export const updateNote = async (note: any) => {
+  const response = await axios.put(url + note.id, note, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  if (response.status === 200) {
+    return response.data;
+  } else {
+    throw new Error(response.statusText);
+  }
+};
   
 export const deleteNote = async (taskId:number) => {
   return await axios.delete(url + taskId).then((response) => {

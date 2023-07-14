@@ -1,13 +1,17 @@
+'use client'
 import './globals.css';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEllipsis, faCircle, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faCircleXmark, faPencilSquare } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-
-library.add(faEllipsis, faCircle, faCircleXmark);
+import Modal from 'react-modal';
+import { useEffect } from 'react';
+library.add(faEllipsis, faCircleXmark, faPencilSquare);
 
 const nunito = Nunito({ subsets: ['latin'] })
+
+Modal.setAppElement('body');
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -18,7 +22,13 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
+  }) {
+    useEffect(() => {
+      // Clean up the app element when the component unmounts
+      return () => {
+        Modal.setAppElement(null);
+      };
+    }, []);
   return (
     <html lang="en">
       <body className={nunito.className}>{children}</body>
