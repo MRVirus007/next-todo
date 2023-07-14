@@ -1,15 +1,18 @@
 'use client'
 import './globals.css';
 import type { Metadata } from 'next';
-import { Nunito } from 'next/font/google';
+//import { Nunito } from 'next/font/google';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEllipsis, faCircleXmark, faPencilSquare } from '@fortawesome/free-solid-svg-icons';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import Modal from 'react-modal';
 import { useEffect } from 'react';
+import { Provider } from 'mobx-react';
+import store from './mobx/store';
+
 library.add(faEllipsis, faCircleXmark, faPencilSquare);
 
-const nunito = Nunito({ subsets: ['latin'] })
+//const nunito = Nunito({ subsets: ['latin'] })
 
 Modal.setAppElement('body');
 
@@ -24,14 +27,18 @@ export default function RootLayout({
   children: React.ReactNode
   }) {
     useEffect(() => {
-      // Clean up the app element when the component unmounts
+      // Clean up the modal element when the component unmounts
       return () => {
-        Modal.setAppElement(null);
+        Modal.setAppElement('');
       };
     }, []);
   return (
     <html lang="en">
-      <body className={nunito.className}>{children}</body>
+      <body>
+      <Provider store={store}>
+          {children}
+        </Provider>
+      </body>
     </html>
   )
 }

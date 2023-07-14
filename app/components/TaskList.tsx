@@ -1,6 +1,6 @@
 'use client';
-import DateComponent from './DateComponent';
-import TaskFilter from './TaskFilter';
+import DateComponent from './date/DateComponent';
+import TaskFilter from './filter/TaskFilter';
 import {addNote, deleteNote, getNotes, updateNote} from '../backend/api'
 import { useEffect, useState } from 'react';
 import {useForm} from "react-hook-form";
@@ -31,7 +31,7 @@ export default function TaskList() {
   const {register, handleSubmit, reset, setValue, formState: {isSubmitting}} = useForm();
   const [notes, setNotes] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalNote, setModalNote] = useState(null);
+  const [modalNote, setModalNote] = useState<any | null>(null);
   
   function GetNotes() {
       getNotes().then((notes:any) => {
