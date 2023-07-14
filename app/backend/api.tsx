@@ -10,7 +10,8 @@ export const getNotes = async () => {
   }
 };
 
-export const addNote = async (note:any) => {
+export const addNote = async (note: any) => {
+    console.log("api addNote here::")
     const response = await axios.post(url, note, {
         headers: {
           'content-type': 'application/json',

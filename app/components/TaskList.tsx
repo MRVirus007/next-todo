@@ -1,13 +1,15 @@
 'use client';
 import DateComponent from './date/DateComponent';
 import TaskFilter from './filter/TaskFilter';
-import {addNote, deleteNote, getNotes, updateNote} from '../backend/api'
+//import {addNote, deleteNote, getNotes, updateNote} from '../backend/api'
 import { useEffect, useState } from 'react';
 import {useForm} from "react-hook-form";
 import Loader from './utilities/Loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faPencil, faPencilSquare } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
+import { observer } from 'mobx-react';
+import store from '../mobx/store';
 
 // Modal Styles
 const customStyles = {
@@ -27,21 +29,26 @@ const customStyles = {
     },
   };
 
-export default function TaskList() {
-  const {register, handleSubmit, reset, setValue, formState: {isSubmitting}} = useForm();
-  const [notes, setNotes] = useState([]);
+const TaskList= observer(() => {
+  const { register, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm();
+  const { notes, fetchNotes, createNote, deleteNote, updateNote } = store;
+  //const [notes, setNotes] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalNote, setModalNote] = useState<any | null>(null);
   
-  function GetNotes() {
-      getNotes().then((notes:any) => {
-          setNotes(notes);
-      });
-  }
+  // function GetNotes() {
+  //     getNotes().then((notes:any) => {
+  //         setNotes(notes);
+  //     });
+  // }
+
+  // useEffect(() => {
+  //     GetNotes();
+  // }, [isSubmitting]);
 
   useEffect(() => {
-      GetNotes();
-  }, [isSubmitting]);
+    fetchNotes();
+  }, []);
   
   //update modal fields with help of setValue from react-hook-form
   useEffect(() => {
@@ -53,13 +60,15 @@ export default function TaskList() {
   }, [modalNote, setValue]);
 
   const onSubmit = async (note: object) => {
-    await addNote(note);
+    console.log("yeah reached onSUbmit")
+    await createNote(note);
     reset();
+    fetchNotes();
   }
 
   const removeNote = async (id: number) => {
       await deleteNote(id);
-      GetNotes();
+      fetchNotes();
   }
 
   //Edit Modal related
@@ -75,6 +84,7 @@ export default function TaskList() {
   const saveNote = async (note: object) => {
     await updateNote(note);
     reset();
+    fetchNotes();
     closeModal();
   };
 
@@ -104,6 +114,7 @@ export default function TaskList() {
                 </ul> : <Loader/>}
                 
           <form onSubmit={handleSubmit(onSubmit)}>
+          <input type='hidden' {...register("id", {required: true})} value={0}/>
                     <label htmlFor="title">Title</label>
                     <input type="text" placeholder='Title' {...register("title", {required: true})}/>
                 
@@ -169,6 +180,8 @@ export default function TaskList() {
       </Modal>
                 
             </div>
-        </>
-    );
-}
+    </>
+    )
+});
+    
+export default TaskList;

@@ -5,27 +5,29 @@ class NoteStore {
   @observable notes: any[] = [];
 
   @action
-  async fetchNotes() {
+  fetchNotes = async () => {
     try {
       const notes = await getNotes();
       this.notes = notes;
     } catch (error) {
       console.error("Error fetching notes:", error);
     }
-  }
+  };
 
   @action
-  async createNote(note: any) {
+  createNote = async (note: any) => {
     try {
+      console.log("on to the createNote");
       const newNote = await addNote(note);
+      console.log("store createNote:: ", newNote);
       this.notes.push(newNote);
     } catch (error) {
       console.error("Error creating note:", error);
     }
-  }
+  };
 
   @action
-  async updateNote(note: any) {
+  updateNote = async (note: any) => {
     try {
       await updateNote(note);
       const index = this.notes.findIndex((n) => n.id === note.id);
@@ -35,17 +37,17 @@ class NoteStore {
     } catch (error) {
       console.error("Error updating note:", error);
     }
-  }
+  };
 
   @action
-  async deleteNote(taskId: number) {
+  deleteNote = async (taskId: number) => {
     try {
       await deleteNote(taskId);
       this.notes = this.notes.filter((note) => note.id !== taskId);
     } catch (error) {
       console.error("Error deleting note:", error);
     }
-  }
+  };
   constructor() {
     makeObservable(this);
   }
