@@ -35,7 +35,7 @@ export default function TaskFilter() {
   return (
     <div className="float-right relative" ref={dropdownRef}>
       <button className={`py-1.5 pr-[0.75rem] pl-[0.75rem] ${styles.btn_light}`} onClick={() => setOpen(!open)}>
-        <FontAwesomeIcon icon={faEllipsis} className="fa-solid fs-4"/>
+        <FontAwesomeIcon icon={faEllipsis} className="fs-4"/>
       </button>
       {open && (
         <ul className={ `${styles.dropdown_menu}`}>

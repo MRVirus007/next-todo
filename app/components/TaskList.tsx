@@ -124,12 +124,13 @@ const TaskList= observer(() => {
                 <DateComponent />
                 <TaskFilter />
           <div className="clear-both"></div>
+          <div className='mt-5 relative flex flex-col min-w-0 h-card-height bg-card-bg border-card-border-width border-card-border-color rounded-card-border-radius'>
           {notes.length !== 0
             ?
-            <ul className="list-group list-group-flush">
+            <ul className="flex flex-col p-0 mb-0 border-list-group-border-color rounded-list-group-border-radius">
               {notes.map((note:any) => (
                 <li
-                  className="list-group-item border-none"
+                  className="flex !important relative py-2 px-4 bg-white hover:z-[2] hover:shadow-[0_3px_6px_1px_#00000026] hover:rounded-[5px]"
                   key={note?.id}
                 >
                   <button
@@ -189,7 +190,8 @@ const TaskList= observer(() => {
             </ul>
             :
             <Loader />
-          }
+            }
+          </div>
                 
           <form onSubmit={addNoteSubmit(onSubmit)}>
             <input type='hidden' {...addNoteRegister("id", { required: true })} value={0} />
