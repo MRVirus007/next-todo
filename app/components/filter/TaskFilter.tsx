@@ -3,12 +3,15 @@ import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styles from './TaskFilter.module.css';
 import { useState } from 'react';
+import store from '../../mobx/store';
 
-export default function TaskFilter(category: any) {
-    const [open, setOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState('');
+export default function TaskFilter(status: string) {
+  const [open, setOpen] = useState(false);
+  const {fetchNotes } = store;
+    const [selectedCategory, setSelectedCategory] = useState('in-progress');
     const onCategorySelected = (category:any) => {
-        setSelectedCategory(category);
+      setSelectedCategory(category);
+      fetchNotes(category);
     };
 
   return (
@@ -21,10 +24,10 @@ export default function TaskFilter(category: any) {
           <li>
             <a
               className={`${styles.dropdown_item} ${
-                selectedCategory === 'Completed' ? 'text-primary' : ''
+                selectedCategory === 'completed' ? 'text-blue-500 !important' : ''
               }`}
               href="#"
-              onClick={() => onCategorySelected('Completed')}
+              onClick={() => onCategorySelected('completed')}
             >
               Completed
             </a>
@@ -32,10 +35,10 @@ export default function TaskFilter(category: any) {
           <li>
             <a
               className={`${styles.dropdown_item} ${
-                selectedCategory === 'In-Progress' ? 'text-primary' : ''
+                selectedCategory === 'in-progress' ? 'text-blue-500 !important' : ''
               }`}
               href="#"
-              onClick={() => onCategorySelected('In-Progress')}
+              onClick={() => onCategorySelected('in-progress')}
             >
               In Progress
             </a>

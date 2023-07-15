@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import {useForm} from "react-hook-form";
 import Loader from './utilities/Loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark, faPencil, faPencilSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faCircleCheck, faCircleDot, faCircleXmark, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faCircle as faRegularCircle } from '@fortawesome/free-regular-svg-icons';
 import Modal from 'react-modal';
 import { observer } from 'mobx-react';
 import store from '../mobx/store';
@@ -30,17 +31,13 @@ const customStyles = {
   };
 
 const TaskList= observer(() => {
-  const { register, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm();
+  const { register: addNoteRegister, handleSubmit: addNoteSubmit, reset: addNoteReset, formState: { isSubmitting: addNoteSubmitting } } = useForm();
+  const { register: updateNoteRegister, handleSubmit: updateNoteSubmit, reset: updateNoteReset, setValue, formState: { isSubmitting: updateNoteSubmitting } } = useForm();
   const { notes, fetchNotes, createNote, deleteNote, updateNote } = store;
-  //const [notes, setNotes] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalNote, setModalNote] = useState<any | null>(null);
-  
-  // function GetNotes() {
-  //     getNotes().then((notes:any) => {
-  //         setNotes(notes);
-  //     });
-  // }
+  //const [isHovered, setIsHovered] = useState(false);
+  const [hoveredItems, setHoveredItems] = useState({});
 
   // useEffect(() => {
   //     GetNotes();
@@ -60,15 +57,19 @@ const TaskList= observer(() => {
   }, [modalNote, setValue]);
 
   const onSubmit = async (note: object) => {
-    console.log("yeah reached onSUbmit")
     await createNote(note);
-    reset();
+    addNoteReset();
     fetchNotes();
   }
 
   const removeNote = async (id: number) => {
       await deleteNote(id);
       fetchNotes();
+  }
+
+  const setStatus = async (note: any) => {
+    await updateNote(note);
+    fetchNotes();
   }
 
   //Edit Modal related
@@ -83,49 +84,107 @@ const TaskList= observer(() => {
   
   const saveNote = async (note: object) => {
     await updateNote(note);
-    reset();
+    updateNoteReset();
     fetchNotes();
     closeModal();
+  };
+
+  const handleMouseEnter = (itemId: number) => {
+    setHoveredItems((prevHoveredItems) => ({
+      ...prevHoveredItems,
+      [itemId]: true,
+    }));
+  };
+
+  const handleMouseLeave = (itemId:number) => {
+    setHoveredItems((prevHoveredItems) => ({
+      ...prevHoveredItems,
+      [itemId]: false,
+    }));
   };
 
     return (
         <>
             <div className="container">
                 <DateComponent />
-                <TaskFilter />
-                <div className="clear-both"></div>
-                {notes.length !== 0 ? <ul>
-                    {notes.map((note:any) => (
-                        <li key={note?.id}>{note?.title}
-                            <button
-                        className={`btn border-none fill-close-btn`}
-                        onClick={() => openModal(note)}
-                        >
-                        <FontAwesomeIcon icon={faPencil} className="text-xs"/>
-                        </button>
-                            <button
-                        className={`btn border-none fill-close-btn`}
-                        onClick={() => removeNote(note?.id)}
-                        >
-                        <FontAwesomeIcon icon={faCircleXmark} className="text-xl text-red-500"/>
-                        </button>
-                        </li>
-                    ))}
-                </ul> : <Loader/>}
+                <TaskFilter status={''} />
+          <div className="clear-both"></div>
+          {notes.length !== 0
+            ?
+            <ul className="list-group list-group-flush">
+              {notes.map((note:any) => (
+                <li
+                  className="list-group-item border-none"
+                  key={note?.id}
+                >
+                  <button
+                    type="button"
+                    className="btn px-0 border-none"
+                    
+                  >
+                    {note?.status === 'in-progress' ? 
+                      <FontAwesomeIcon
+                        icon={hoveredItems[note?.id] ? faCircle : faRegularCircle}
+                        onClick={() => {
+                          note.status = "completed";
+                          setStatus(note);
+                        }}
+                        onMouseEnter={() => handleMouseEnter(note?.id)}
+                        onMouseLeave={() => handleMouseLeave(note?.id)}
+                        className="text-gray-300 text-xl transition-colors duration-300 hover:text-gray-500"
+                      />
+                      : 
+                      <FontAwesomeIcon
+                        icon={faCircleCheck}
+                        onClick={() => {
+                          note.status = "in-progress";
+                          setStatus(note);
+                        }}
+                        className="text-gray-300 text-xl transition-colors duration-300 hover:text-gray-500"
+                      />
+                    }
+                    
+                  </button>
+                  <label
+                    className={`form-check-label ms-2 ${note?.status === 'completed' ? 'line-through' : ''}`}
+                  >
+                    {note?.title}
+                  </label>
+                  {note?.status === 'in-progress' && 
+                    <button
+                      className={`btn border-none fill-close-btn`}
+                      onClick={() => openModal(note)}
+                      >
+                      <FontAwesomeIcon icon={faPencil} className="text-xs"/>
+                    </button>
+                  }
+                      <button
+                  className={`btn border-none fill-close-btn`}
+                  onClick={() => removeNote(note?.id)}
+                  >
+                  <FontAwesomeIcon icon={faCircleXmark} className="text-xl text-red-500"/>
+                  </button>
+                  </li>
+              ))}
+            </ul>
+            :
+            <Loader />
+          }
                 
-          <form onSubmit={handleSubmit(onSubmit)}>
-          <input type='hidden' {...register("id", {required: true})} value={0}/>
+          <form onSubmit={addNoteSubmit(onSubmit)}>
+            <input type='hidden' {...addNoteRegister("id", { required: true })} value={0} />
+            <input type='hidden' {...addNoteRegister("status", {required: true})} value={"in-progress"}/>
                     <label htmlFor="title">Title</label>
-                    <input type="text" placeholder='Title' {...register("title", {required: true})}/>
+                    <input type="text" placeholder='Title' {...addNoteRegister("title", {required: true})}/>
                 
                     <label htmlFor="description">Description</label>
-                    <input type="text" placeholder='Description' {...register("description", {required: true})}/>
+                    <input type="text" placeholder='Description' {...addNoteRegister("description", {required: true})}/>
                 
                     <button type="submit"
-                        disabled={isSubmitting}
-                        className={`inline-flex items-center px-4 py-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${isSubmitting ? 'cursor-not-allowed' : ''}`}
+                        disabled={addNoteSubmitting}
+                        className={`inline-flex items-center px-4 py-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${addNoteSubmitting ? 'cursor-not-allowed' : ''}`}
                         >
-                        {isSubmitting ?
+                        {addNoteSubmitting ?
                                 <Loader/>
                             : "Submit"}
                     </button>
@@ -149,30 +208,30 @@ const TaskList= observer(() => {
           </button>
         </div>
         <div className="px-16 pt-15 relative flex-1 flex-grow-1 mt-4">
-          <form onSubmit={handleSubmit(saveNote)}>
+          <form onSubmit={updateNoteSubmit(saveNote)}>
                 <div className="flex flex-col items-center">
-                <input type='hidden' {...register("id", {required: true})}/>
+                <input type='hidden' {...updateNoteRegister("id", {required: true})}/>
               <input
                 type="text"
                 className="!outline-none mb-4 block w-full text-sm font-medium text-gray-700 border-bottom-1"
                     id="title"
                 placeholder="Edit Title"
-                {...register("title")}
+                {...updateNoteRegister("title")}
               />
               <textarea
                 className="!outline-none mb-4 block w-full text-sm font-medium text-gray-700 border-bottom-1"
                     id="description"
                 placeholder="Edit Description"
-                {...register("description")}
+                {...updateNoteRegister("description")}
               />
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={updateNoteSubmitting}
                 className={`inline-flex items-center p-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${
-                  isSubmitting ? "cursor-not-allowed" : ""
+                  updateNoteSubmitting ? "cursor-not-allowed" : ""
                 }`}
               >
-                {isSubmitting ? <Loader /> : "Save Note"}
+                {updateNoteSubmitting ? <Loader /> : "Save Note"}
               </button>
             </div>
           </form>
