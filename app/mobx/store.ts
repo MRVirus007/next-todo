@@ -13,7 +13,6 @@ class NoteStore {
   @action
   fetchNotes = async (status: string = "in-progress") => {
     try {
-      console.log("from store:: ", status);
       const notes = await getNotes();
       this.notes = notes.filter((note: any) => note.status === status);
     } catch (error) {
@@ -25,7 +24,6 @@ class NoteStore {
   createNote = async (note: any) => {
     try {
       const newNote = await addNote(note);
-      console.log("store createNote:: ", newNote);
       this.notes.push(newNote);
     } catch (error) {
       console.error("Error creating note:", error);

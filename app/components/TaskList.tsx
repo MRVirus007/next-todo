@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import {useForm} from "react-hook-form";
 import Loader from './utilities/Loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faCircleCheck, faCircleDot, faCircleXmark, faPencil } from '@fortawesome/free-solid-svg-icons';
-import { faCircle as faRegularCircle } from '@fortawesome/free-regular-svg-icons';
+import { faCircle, faCircleCheck, faCircleXmark, faPencil } from '@fortawesome/free-solid-svg-icons';
+import { faCircle as faRegularCircle, faCircleXmark as faRegularCircleXmark } from '@fortawesome/free-regular-svg-icons';
 import Modal from 'react-modal';
 import { observer } from 'mobx-react';
 import store from '../mobx/store';
@@ -37,7 +37,8 @@ const TaskList= observer(() => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalNote, setModalNote] = useState<any | null>(null);
   //const [isHovered, setIsHovered] = useState(false);
-  const [hoveredItems, setHoveredItems] = useState({});
+  const [hoveredItemsRadio, setHoveredItemsRadio] = useState({});
+  const [hoveredItemsDelete, setHoveredItemsDelete] = useState({});
 
   // useEffect(() => {
   //     GetNotes();
@@ -89,16 +90,30 @@ const TaskList= observer(() => {
     closeModal();
   };
 
-  const handleMouseEnter = (itemId: number) => {
-    setHoveredItems((prevHoveredItems) => ({
-      ...prevHoveredItems,
+  const handleMouseEnterRadio = (itemId: number) => {
+    setHoveredItemsRadio((prevHoveredItemsRadio) => ({
+      ...prevHoveredItemsRadio,
       [itemId]: true,
     }));
   };
 
-  const handleMouseLeave = (itemId:number) => {
-    setHoveredItems((prevHoveredItems) => ({
-      ...prevHoveredItems,
+  const handleMouseLeaveRadio = (itemId:number) => {
+    setHoveredItemsRadio((prevHoveredItemsRadio) => ({
+      ...prevHoveredItemsRadio,
+      [itemId]: false,
+    }));
+  };
+
+  const handleMouseEnterDelete = (itemId: number) => {
+    setHoveredItemsDelete((prevHoveredItemsDelete) => ({
+      ...prevHoveredItemsDelete,
+      [itemId]: true,
+    }));
+  };
+
+  const handleMouseLeaveDelete = (itemId:number) => {
+    setHoveredItemsDelete((prevHoveredItemsDelete) => ({
+      ...prevHoveredItemsDelete,
       [itemId]: false,
     }));
   };
@@ -107,7 +122,7 @@ const TaskList= observer(() => {
         <>
             <div className="container">
                 <DateComponent />
-                <TaskFilter status={''} />
+                <TaskFilter />
           <div className="clear-both"></div>
           {notes.length !== 0
             ?
@@ -124,13 +139,13 @@ const TaskList= observer(() => {
                   >
                     {note?.status === 'in-progress' ? 
                       <FontAwesomeIcon
-                        icon={hoveredItems[note?.id] ? faCircle : faRegularCircle}
+                        icon={hoveredItemsRadio[note?.id] ? faCircle : faRegularCircle}
                         onClick={() => {
                           note.status = "completed";
                           setStatus(note);
                         }}
-                        onMouseEnter={() => handleMouseEnter(note?.id)}
-                        onMouseLeave={() => handleMouseLeave(note?.id)}
+                        onMouseEnter={() => handleMouseEnterRadio(note?.id)}
+                        onMouseLeave={() => handleMouseLeaveRadio(note?.id)}
                         className="text-gray-300 text-xl transition-colors duration-300 hover:text-gray-500"
                       />
                       : 
@@ -162,7 +177,12 @@ const TaskList= observer(() => {
                   className={`btn border-none fill-close-btn`}
                   onClick={() => removeNote(note?.id)}
                   >
-                  <FontAwesomeIcon icon={faCircleXmark} className="text-xl text-red-500"/>
+                    <FontAwesomeIcon
+                      icon={hoveredItemsDelete[note?.id] ? faCircleXmark : faRegularCircleXmark}
+                      className="text-xl text-red-500 transition-colors duration-300 hover:text-red-500"
+                      onMouseEnter={() => handleMouseEnterDelete(note?.id)}
+                      onMouseLeave={() => handleMouseLeaveDelete(note?.id)}
+                    />
                   </button>
                   </li>
               ))}
