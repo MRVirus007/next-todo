@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import {useForm} from "react-hook-form";
 import Loader from './utilities/Loader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faCircleCheck, faCircleXmark, faPencil } from '@fortawesome/free-solid-svg-icons';
-import { faCircle as faRegularCircle, faCircleXmark as faRegularCircleXmark } from '@fortawesome/free-regular-svg-icons';
+import { faCircle, faCircleCheck, faCircleXmark, faPencil,faEye, faPlusCircle, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
+import { faCircle as faRegularCircle, faCircleXmark as faRegularCircleXmark, faEye as faRegularEye } from '@fortawesome/free-regular-svg-icons';
 import Modal from 'react-modal';
 import { observer } from 'mobx-react';
 import store from '../mobx/store';
@@ -21,7 +21,7 @@ const customStyles = {
       padding: '0',
       width: 'auto',
       maxWidth: '90vh',
-      height: '40vh',
+      height: 'max-content',
       //maxHeight: 'calc(100vh - 100px)',
       margin: '0 auto',
       overflow: 'auto',
@@ -36,9 +36,10 @@ const TaskList= observer(() => {
   const { notes, fetchNotes, createNote, deleteNote, updateNote } = store;
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalNote, setModalNote] = useState<any | null>(null);
-  //const [isHovered, setIsHovered] = useState(false);
   const [hoveredItemsRadio, setHoveredItemsRadio] = useState({});
   const [hoveredItemsDelete, setHoveredItemsDelete] = useState({});
+  const [hoveredItemsView, setHoveredItemsView] = useState({});
+  const [hoveredModalCloseIcon, sethoveredModalCloseIcon] = useState(false);
 
   // useEffect(() => {
   //     GetNotes();
@@ -118,27 +119,38 @@ const TaskList= observer(() => {
     }));
   };
 
+  const handleMouseEnterView = (itemId: number) => {
+    setHoveredItemsView((prevHoveredItemsView) => ({
+      ...prevHoveredItemsView,
+      [itemId]: true,
+    }));
+  };
+
+  const handleMouseLeaveView = (itemId:number) => {
+    setHoveredItemsView((prevHoveredItemsView) => ({
+      ...prevHoveredItemsView,
+      [itemId]: false,
+    }));
+  };
+
     return (
         <>
             <div className="container">
                 <DateComponent />
                 <TaskFilter />
           <div className="clear-both"></div>
-          <div className='mt-5 relative flex flex-col min-w-0 h-card-height bg-card-bg border-card-border-width border-card-border-color rounded-card-border-radius'>
+          <div className='mt-5 relative flex flex-col'>
           {notes.length !== 0
             ?
             <ul className="flex flex-col p-0 mb-0 border-list-group-border-color rounded-list-group-border-radius">
               {notes.map((note:any) => (
-                <li
-                  className="flex !important relative py-2 px-4 bg-white hover:z-[2] hover:shadow-[0_3px_6px_1px_#00000026] hover:rounded-[5px]"
-                  key={note?.id}
-                >
+                <li className="flex items-center justify-between py-2 px-4 bg-white hover:z-[1] hover:shadow-[0_3px_6px_1px_#00000026] hover:rounded-[5px]" key={note?.id}>
+                <div className="flex items-center">
                   <button
                     type="button"
                     className="btn px-0 border-none"
-                    
                   >
-                    {note?.status === 'in-progress' ? 
+                    {note?.status === 'in-progress' ? (
                       <FontAwesomeIcon
                         icon={hoveredItemsRadio[note?.id] ? faCircle : faRegularCircle}
                         onClick={() => {
@@ -149,7 +161,7 @@ const TaskList= observer(() => {
                         onMouseLeave={() => handleMouseLeaveRadio(note?.id)}
                         className="text-gray-300 text-xl transition-colors duration-300 hover:text-gray-500"
                       />
-                      : 
+                    ) : (
                       <FontAwesomeIcon
                         icon={faCircleCheck}
                         onClick={() => {
@@ -158,75 +170,113 @@ const TaskList= observer(() => {
                         }}
                         className="text-gray-300 text-xl transition-colors duration-300 hover:text-gray-500"
                       />
-                    }
-                    
+                    )}
                   </button>
                   <label
                     className={`form-check-label ms-2 ${note?.status === 'completed' ? 'line-through' : ''}`}
                   >
                     {note?.title}
                   </label>
-                  {note?.status === 'in-progress' && 
-                    <button
-                      className={`btn border-none fill-close-btn`}
+                </div>
+                <div className="flex">
+                  <button className="btn border-none">
+                    <FontAwesomeIcon
+                      icon={hoveredItemsView[note?.id] ? faEye : faRegularEye}
+                      className="text-xl text-green-500 transition-colors duration-300 hover:text-green-500"
+                      onMouseEnter={() => handleMouseEnterView(note?.id)}
+                      onMouseLeave={() => handleMouseLeaveView(note?.id)}
                       onClick={() => openModal(note)}
-                      >
-                      <FontAwesomeIcon icon={faPencil} className="text-xs"/>
-                    </button>
-                  }
-                      <button
-                  className={`btn border-none fill-close-btn`}
-                  onClick={() => removeNote(note?.id)}
-                  >
+                    />
+                  </button>
+                  <button className="btn border-none">
                     <FontAwesomeIcon
                       icon={hoveredItemsDelete[note?.id] ? faCircleXmark : faRegularCircleXmark}
                       className="text-xl text-red-500 transition-colors duration-300 hover:text-red-500"
                       onMouseEnter={() => handleMouseEnterDelete(note?.id)}
                       onMouseLeave={() => handleMouseLeaveDelete(note?.id)}
+                      onClick={() => removeNote(note?.id)}
                     />
                   </button>
-                  </li>
+                </div>
+              </li>
               ))}
+                <li className="flex items-center justify-between py-2 px-4 bg-white hover:z-[1] hover:shadow-[0_3px_6px_1px_#00000026] hover:rounded-[5px]">
+                
+                  <div className="flex items-center">
+                <button
+                  type="button"
+                  className="btn px-0 border-none"
+                >
+                  <FontAwesomeIcon
+                      icon={faPlusSquare}
+                      className="text-xl text-blue-500 transition-colors duration-300 hover:text-blue-500"
+                    />
+                    </button>
+                    <form onSubmit={addNoteSubmit(onSubmit)}>
+                      <input type='hidden' {...addNoteRegister("id", { required: true })} value={0} />
+                      <input type='hidden' {...addNoteRegister("status", {required: true})} value={"in-progress"}/>
+                  <input
+                    type="text"
+                    placeholder="Add Title"
+                    className="border-none !outline-none w-96"
+                    {...addNoteRegister("title", { required: true })}
+                    maxLength={100}
+                    />
+                    <textarea
+                      name="description"
+                      style={{
+                        height: 25,
+                      }}
+                      onKeyDown={(e) => {
+                        e.target.style.height = '25px';
+                        e.target.style.height = `${e.target.scrollHeight}px`; 
+                      }}
+                      cols={60}
+                      className="!outline-none"
+                      placeholder="Add Description"
+                      {...addNoteRegister("description", {required: true})}
+                      ></textarea>
+                      <button type="submit"
+                        disabled={addNoteSubmitting}
+                        className={`relative left-[9%] hover:text-gray-100 inline-flex items-center px-4 py-2 text-sm font-semibold leading-6 text-blue-400 transition duration-150 ease-in-out border-2 border-blue-400 hover:bg-blue-400 rounded-md shadow ${addNoteSubmitting ? 'cursor-not-allowed' : ''}`}
+                        >
+                        {addNoteSubmitting ?
+                                <Loader/>
+                            : <FontAwesomeIcon
+                        icon={faPlusCircle}
+                        className="text-xl transition-colors duration-300"
+                      />}
+                    </button>
+                      </form>
+                    </div>
+                    
+                </li>
             </ul>
             :
             <Loader />
             }
           </div>
-                
-          <form onSubmit={addNoteSubmit(onSubmit)}>
-            <input type='hidden' {...addNoteRegister("id", { required: true })} value={0} />
-            <input type='hidden' {...addNoteRegister("status", {required: true})} value={"in-progress"}/>
-                    <label htmlFor="title">Title</label>
-                    <input type="text" placeholder='Title' {...addNoteRegister("title", {required: true})}/>
-                
-                    <label htmlFor="description">Description</label>
-                    <input type="text" placeholder='Description' {...addNoteRegister("description", {required: true})}/>
-                
-                    <button type="submit"
-                        disabled={addNoteSubmitting}
-                        className={`inline-flex items-center px-4 py-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${addNoteSubmitting ? 'cursor-not-allowed' : ''}`}
-                        >
-                        {addNoteSubmitting ?
-                                <Loader/>
-                            : "Submit"}
-                    </button>
-                </form>
 
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
-        contentLabel="Edit Note Modal"
+            contentLabel="Edit Note Modal"
       >
         <div className="px-5 pt-0 flex flex-shrink-0 items-center justify-between border-top-left-radius-md border-top-right-radius-md">
-          <h4 className="mb-0 lh-150">Edit Note</h4>
+          <h4 className="mb-0 lh-150">View / Edit Note</h4>
           <button
             type="button"
-            className="btn border-none fill-close-btn"
+            className="btn border-none"
             aria-label="Close"
             onClick={closeModal}
           >
-            <FontAwesomeIcon icon={faCircleXmark} className="fa-regular text-xl text-gray-900"/>
+                <FontAwesomeIcon
+                  icon={hoveredModalCloseIcon ? faRegularCircleXmark : faCircleXmark}
+                  className="fa-regular text-xl text-gray-900"
+                  onMouseEnter={() => sethoveredModalCloseIcon(true)}
+                  onMouseLeave={() => sethoveredModalCloseIcon(false)}
+                />
           </button>
         </div>
         <div className="px-16 pt-15 relative flex-1 flex-grow-1 mt-4">
@@ -234,7 +284,8 @@ const TaskList= observer(() => {
                 <div className="flex flex-col items-center">
                 <input type='hidden' {...updateNoteRegister("id", {required: true})}/>
               <input
-                type="text"
+                    type="text"
+                    maxLength={100}
                 className="!outline-none mb-4 block w-full text-sm font-medium text-gray-700 border-bottom-1"
                     id="title"
                 placeholder="Edit Title"
@@ -249,7 +300,7 @@ const TaskList= observer(() => {
               <button
                 type="submit"
                 disabled={updateNoteSubmitting}
-                className={`inline-flex items-center p-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${
+                className={`mb-3 inline-flex items-center p-2 text-sm font-semibold leading-6 text-green-400 transition duration-150 ease-in-out border-2 border-green-400 rounded-md shadow ${
                   updateNoteSubmitting ? "cursor-not-allowed" : ""
                 }`}
               >

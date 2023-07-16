@@ -1,60 +1,58 @@
-import { observable, action, makeObservable } from "mobx";
-import {
-  getNotes,
-  addNote,
-  updateNote,
-  deleteNote,
-  updateStatus,
-} from "../backend/api";
+import { types, flow } from "mobx-state-tree";
+import { getNotes, addNote, updateNote, deleteNote } from "../backend/api";
 
-class NoteStore {
-  @observable notes: any[] = [];
+const Note = types.model("Note", {
+  id: types.identifier,
+  title: types.string,
+  description: types.string,
+  status: types.string,
+});
 
-  @action
-  fetchNotes = async (status: string = "in-progress") => {
-    try {
-      const notes = await getNotes();
-      this.notes = notes.filter((note: any) => note.status === status);
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-    }
-  };
-
-  @action
-  createNote = async (note: any) => {
-    try {
-      const newNote = await addNote(note);
-      this.notes.push(newNote);
-    } catch (error) {
-      console.error("Error creating note:", error);
-    }
-  };
-
-  @action
-  updateNote = async (note: any) => {
-    try {
-      await updateNote(note);
-      const index = this.notes.findIndex((n) => n.id === note.id);
-      if (index !== -1) {
-        this.notes[index] = note;
+const NoteStore = types
+  .model("NoteStore", {
+    notes: types.array(Note),
+  })
+  .actions((self) => ({
+    fetchNotes: flow(function* (status = "in-progress") {
+      try {
+        const notes = yield getNotes();
+        self.notes = notes.filter((note) => note.status === status);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
       }
-    } catch (error) {
-      console.error("Error updating note:", error);
-    }
-  };
+    }),
 
-  @action
-  deleteNote = async (taskId: number) => {
-    try {
-      await deleteNote(taskId);
-      this.notes = this.notes.filter((note) => note.id !== taskId);
-    } catch (error) {
-      console.error("Error deleting note:", error);
-    }
-  };
-  constructor() {
-    makeObservable(this);
-  }
-}
+    createNote: flow(function* (note) {
+      try {
+        const newNote = yield addNote(note);
+        self.notes.push(newNote);
+      } catch (error) {
+        console.error("Error creating note:", error);
+      }
+    }),
 
-export default new NoteStore();
+    updateNote: flow(function* (note) {
+      try {
+        yield updateNote(note);
+        const index = self.notes.findIndex((n) => n.id === note.id);
+        if (index !== -1) {
+          self.notes[index] = note;
+        }
+      } catch (error) {
+        console.error("Error updating note:", error);
+      }
+    }),
+
+    deleteNote: flow(function* (taskId) {
+      try {
+        yield deleteNote(taskId);
+        self.notes = self.notes.filter((note) => note.id !== taskId);
+      } catch (error) {
+        console.error("Error deleting note:", error);
+      }
+    }),
+  }));
+
+export default NoteStore.create({
+  notes: [],
+});

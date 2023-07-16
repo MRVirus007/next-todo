@@ -43,20 +43,13 @@
   border-bottom: 1px solid #ccc;
 }
 
-.fill-close-btn .fa-regular:hover {
-  font-weight: 900;
-}
-
 .fs-4 {
   font-size: calc(1.275rem + .3vw) !important;
 }
 
-.fa-pencil,
-.fa-pen-to-square {
-  color: #198754;
-  border: .5vh solid #198754;
-  border-radius: 50%;
-  padding: .3vh;
+.ReactModalPortal {
+  position: absolute;
+  z-index: 2;
 }
 
 @media (max-width: 800px) {
