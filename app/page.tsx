@@ -1,5 +1,4 @@
-import Image from 'next/image'
-import TaskList from './components/TaskList'
+import TaskList from './components/tasklist/TaskList'
 
 export default function Home() {
   return (
