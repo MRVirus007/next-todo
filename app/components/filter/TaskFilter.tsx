@@ -7,7 +7,7 @@ export default function TaskFilter() {
   const [open, setOpen] = useState(false);
   const { fetchNotes } = store;
   const [selectedCategory, setSelectedCategory] = useState('in-progress');
-  const onCategorySelected = (category) => {
+  const onCategorySelected = (category: string) => {
     setSelectedCategory(category);
     setOpen(!open);
     fetchNotes(category);
@@ -17,7 +17,7 @@ export default function TaskFilter() {
 
   useEffect(() => {
     // Event listener callback to close the dropdown when a click occurs outside of it
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: any) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpen(false);
       }

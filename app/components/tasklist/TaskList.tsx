@@ -24,7 +24,7 @@ const TaskList = observer(() => {
 
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [fetchNotes]);
 
   const onSubmit = async (note: any) => {
     const response = await createNote(note);
@@ -131,6 +131,7 @@ const TaskList = observer(() => {
             <ul className="flex flex-col p-0 mb-0 border-list-group-border-color rounded-list-group-border-radius">
               {notes.map((note: any) => (
                 <TaskItem
+                  key={note.id}
                   note={note}
                   hoveredItemsRadio={hoveredItemsRadio}
                   hoveredItemsDelete={hoveredItemsDelete}
