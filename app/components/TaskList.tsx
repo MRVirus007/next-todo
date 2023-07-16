@@ -218,12 +218,11 @@ const TaskList= observer(() => {
                   <input
                     type="text"
                     placeholder="Add Title"
-                    className="border-none !outline-none w-96"
+                    className="border-none !outline-none xs:w-24 lg:w-96"
                     {...addNoteRegister("title", { required: true })}
                     maxLength={100}
                     />
                     <textarea
-                      name="description"
                       style={{
                         height: 25,
                       }}
@@ -231,8 +230,7 @@ const TaskList= observer(() => {
                         e.target.style.height = '25px';
                         e.target.style.height = `${e.target.scrollHeight}px`; 
                       }}
-                      cols={60}
-                      className="!outline-none"
+                      className="!outline-none xs:w-24 lg:w-96"
                       placeholder="Add Description"
                       {...addNoteRegister("description", {required: true})}
                       ></textarea>
@@ -261,7 +259,7 @@ const TaskList= observer(() => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
-            contentLabel="Edit Note Modal"
+            contentLabel="View Edit Note Modal"
       >
         <div className="px-5 pt-0 flex flex-shrink-0 items-center justify-between border-top-left-radius-md border-top-right-radius-md">
           <h4 className="mb-0 lh-150">View / Edit Note</h4>
@@ -272,7 +270,7 @@ const TaskList= observer(() => {
             onClick={closeModal}
           >
                 <FontAwesomeIcon
-                  icon={hoveredModalCloseIcon ? faRegularCircleXmark : faCircleXmark}
+                  icon={hoveredModalCloseIcon ? faCircleXmark : faRegularCircleXmark}
                   className="fa-regular text-xl text-gray-900"
                   onMouseEnter={() => sethoveredModalCloseIcon(true)}
                   onMouseLeave={() => sethoveredModalCloseIcon(false)}
