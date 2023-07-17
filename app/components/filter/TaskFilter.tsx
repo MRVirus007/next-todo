@@ -13,7 +13,7 @@ export default function TaskFilter() {
     fetchNotes(category);
   };
 
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Event listener callback to close the dropdown when a click occurs outside of it

@@ -170,8 +170,9 @@ const TaskList = observer(() => {
                         height: 25,
                       }}
                       onKeyDown={(e) => {
-                        e.target.style.height = '25px';
-                        e.target.style.height = `${e.target.scrollHeight}px`;
+                        const target = e.target as HTMLTextAreaElement;
+                        target.style.height = '25px';
+                        target.style.height = `${target.scrollHeight}px`;
                       }}
                       className="!outline-none xs:w-24 lg:w-96"
                       placeholder="Add Description"
@@ -199,7 +200,6 @@ const TaskList = observer(() => {
         modalIsOpen={modalIsOpen}
         closeModal={closeModal}
         modalNote={modalNote}
-        setModalNote={setModalNote}
         saveNote={saveNote}
         hoveredModalCloseIcon={hoveredModalCloseIcon}
         setHoveredModalCloseIcon={setHoveredModalCloseIcon}

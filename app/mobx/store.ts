@@ -17,7 +17,7 @@ const NoteStore = types
     fetchNotes: flow(function* (status = "in-progress") {
       try {
         const notes = yield getNotes();
-        self.notes = notes.filter((note) => note.status === status);
+        self.notes = notes.filter((note: any) => note.status === status);
         self.error = null;
       } catch (error) {
         self.error = "Error fetching notes: " + error;
@@ -48,7 +48,7 @@ const NoteStore = types
         }
       } catch (error) {
         self.error = "Error updating notes: " + error;
-        console.log("Error updating notes: " + error);
+        console.error("Error updating notes: " + error);
         return false;
       }
       return true;
@@ -57,7 +57,9 @@ const NoteStore = types
     deleteNote: flow(function* (taskId) {
       try {
         yield deleteNote(taskId);
-        self.notes = self.notes.filter((note) => note.id !== taskId);
+        self.notes = types
+          .array(Note)
+          .create(self.notes.filter((note) => note.id !== taskId));
       } catch (error) {
         self.error = "Error deleting notes: " + error;
         console.error("Error deleting note:", error);

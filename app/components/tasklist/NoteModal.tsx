@@ -27,7 +27,6 @@ interface NoteModalProps {
   modalIsOpen: boolean;
   closeModal: () => void;
   modalNote: any;
-  setModalNote: (note: any) => void;
   saveNote: (note: any) => void;
   hoveredModalCloseIcon: boolean;
   setHoveredModalCloseIcon: (value: boolean) => void;
@@ -41,7 +40,6 @@ const NoteModal = ({
   modalIsOpen,
   closeModal,
   modalNote,
-  setModalNote,
   saveNote,
   hoveredModalCloseIcon,
   setHoveredModalCloseIcon,
